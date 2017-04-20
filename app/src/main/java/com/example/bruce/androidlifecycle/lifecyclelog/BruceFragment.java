@@ -125,6 +125,9 @@ public class BruceFragment extends Fragment {
         recLifeCycle(getClass(), RETURN_FROM_SUPER);
         if(!mCreated){
             //TODO:初始化布局,findViewById
+
+//            getFragmentManager();
+//            getChildFragmentManager();
         }
     }
 

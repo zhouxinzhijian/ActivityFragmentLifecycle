@@ -1,5 +1,6 @@
 package com.example.bruce.androidlifecycle.lifecyclelog;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -12,6 +13,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 
 import com.example.bruce.androidlifecycle.R;
 
@@ -43,10 +45,31 @@ public class BruceFragmentActivity extends FragmentActivity {
         LoaderManager.enableDebugLogging(true);
 
         if(savedInstanceState == null){
+//            getFragmentManager()//Activity中的FragmentManager
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, BruceFragment.newInstance(0))
                     .commit();
             //TODO:需要测试attach方法，对于的生命周期执行逻辑？？？？？？？
+            final BruceDialogFragment bruceDialogFragment = BruceDialogFragment.newInstance();
+            findViewById(R.id.show_dialog).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {//TODO:dialog上不能再加Fragment了
+//                    Dialog dialog = new Dialog(BruceFragmentActivity.this);
+//                    View rootView = View.inflate(BruceFragmentActivity.this, R.layout.activity_bruce_dialog, null);
+//                    rootView.findViewById(R.id.show_dialog).setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            getSupportFragmentManager().beginTransaction()
+//                                    .add(R.id.dialog_fragment_container, BruceDialogFragment.newInstance())
+//                                    .commit();
+//                        }
+//                    });
+//                    dialog.setContentView(rootView);
+//                    dialog.show();
+
+                    bruceDialogFragment.showDialog(BruceFragmentActivity.this, "dialog");
+                }
+            });
         }else{
             //Activity对相应的Fragment进行重建，重建的时候到底恢复了哪些数据，View内部的context是哪个context（这一个还是上一个）
             //Glide的引用了已经onDestory的Activity是厉害之后产生的，还是回到界面后产生的？？？？？

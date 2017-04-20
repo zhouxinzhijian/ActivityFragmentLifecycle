@@ -6,5 +6,6 @@
     <string name="app_name_bruce">Bruce Lifecycle</string>
     <string name="action_settings">Settings</string>
     <string name="message">Please see logcat</string>
+    <string name="action_show_dialog">Show a dialog</string>
 
 </resources>
