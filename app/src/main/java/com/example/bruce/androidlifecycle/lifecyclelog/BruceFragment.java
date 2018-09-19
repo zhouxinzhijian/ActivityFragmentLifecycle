@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 
 import com.example.bruce.androidlifecycle.R;
 
@@ -58,7 +57,9 @@ public class BruceFragment extends Fragment {
 //        setHasOptionsMenu(true);//创建菜单
 //        setRetainInstance(true);
         //TODO：设置上面参数，当配置变化时（旋转屏幕，修改系统字体，修改系统语言等）onCreate不会再调用,会重用上一个Fragment
-        //TODO：没多大用。因为现在的应用多数都不让屏幕旋转，唱吧也不能旋转（即便旋转也可以将对应的Activity设置成android:configChanges="orientation|keyboardHidden|screenSize"，在onConfigurationChanged中处理旋转后的相关值变化，比如屏幕参数）
+        //TODO: 当Fragment作为后台工作任务时，将setRetainInstance(true)很有用，比如讲工作线程写到Fragment中。
+        //TODO: 如果setRetainInstance(true)，这必须在onCreateView必须重建布局，不能保存上一次的布局，因为那样会导致内存泄露
+        //TODO：其他时候没多大用。因为现在的应用多数都不让屏幕旋转，唱吧也不能旋转（即便旋转也可以将对应的Activity设置成android:configChanges="orientation|keyboardHidden|screenSize"，在onConfigurationChanged中处理旋转后的相关值变化，比如屏幕参数）
         //TODO:如果是pad，横竖屏不一样另作详细研究处理
         //1.旋转屏幕后不调用onCreate（Activity销毁重建依然会走）
         //2.使用这种操作的Fragment不能加入backstack后退栈中（为什么？？）
@@ -110,6 +111,19 @@ public class BruceFragment extends Fragment {
 
         Context context = mRootView.getContext();
         Log.e(getClass().getSimpleName(), "mRootView's context is " + context.getClass().getSimpleName());
+
+        //test
+        mRootView.findViewById(R.id.log_view).addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                Log.e(BruceFragment.class.getSimpleName(), "onViewAttachedToWindow");
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                Log.e(BruceFragment.class.getSimpleName(), "onViewDetachedFromWindow");
+            }
+        });
 
         return mRootView;
     }
@@ -206,7 +220,7 @@ public class BruceFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         recLifeCycle(getClass(), RETURN_FROM_SUPER);
-        //TODO:如果该Fragment还有嵌套的Fragment，那应该讲result的结果再分发下去
+        //TODO:如果该Fragment还有嵌套的Fragment，那应该将result的结果再分发下去
     }
 
     @Override
@@ -226,7 +240,7 @@ public class BruceFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         //TODO:用于在ViewPager中的Fragment显示隐藏处理，其他时候用不到
-        //利用这个方法可以实现 Fragment 懒加载
+        //TODO：利用这个方法可以实现 Fragment 懒加载。当Fragment用在ViewPager中要特别注意，该方法的调用在所有生命周期方法之前（包括onAttach方法，可以看相关源码），所有，如果要在这个方法中做网络请求相关操作，通过bundle传递的参数不能及时获得
     }
 
     /**-------------------------------基本不用的------------------------------------------*/

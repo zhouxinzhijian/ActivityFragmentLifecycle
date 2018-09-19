@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.Menu;
+import android.view.View;
 
 import com.example.bruce.androidlifecycle.R;
 
@@ -29,6 +31,13 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         recLifeCycle(getClass(), RETURN_FROM_SUPER);
         setContentView(R.layout.activity_main);
+
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, BruceFragmentActivity.class));
+            }
+        });
 
         FragmentManager.enableDebugLogging(true);
         LoaderManager.enableDebugLogging(true);
@@ -192,5 +201,17 @@ public class MainActivity extends Activity {
         recLifeCycle(getClass(), CALL_TO_SUPER);
         super.onUserInteraction();
         recLifeCycle(getClass(), RETURN_FROM_SUPER);
+    }
+
+
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        return super.onRetainNonConfigurationInstance();
+    }
+
+    @Nullable
+    @Override
+    public Object getLastNonConfigurationInstance() {
+        return super.getLastNonConfigurationInstance();
     }
 }

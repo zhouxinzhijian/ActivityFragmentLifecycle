@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,6 +63,13 @@ public class TestCompatFragment extends Fragment {
         super.onAttach(activity);
         recLifeCycle(getClass(), RETURN_FROM_SUPER);
 
+    }
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        recLifeCycle(getClass(), CALL_TO_SUPER);
+        super.onAttachFragment(childFragment);
+        recLifeCycle(getClass(), RETURN_FROM_SUPER);
     }
 
     @Override

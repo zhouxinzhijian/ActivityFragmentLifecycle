@@ -32,7 +32,9 @@
         <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
         <activity
             android:name=".lifecyclelog.BruceFragmentActivity"
-            android:taskAffinity="com.scvngr.levelup.lifecycle.native"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:label="@string/app_name_bruce">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

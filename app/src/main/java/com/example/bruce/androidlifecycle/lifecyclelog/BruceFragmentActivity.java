@@ -1,6 +1,5 @@
 package com.example.bruce.androidlifecycle.lifecyclelog;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -8,8 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.util.Log;
 import android.view.Menu;
@@ -17,7 +14,6 @@ import android.view.View;
 
 import com.example.bruce.androidlifecycle.R;
 
-import static com.example.bruce.androidlifecycle.lifecyclelog.Util.LifecycleState.CALL_TO_SUPER;
 import static com.example.bruce.androidlifecycle.lifecyclelog.Util.LifecycleState.RETURN_FROM_SUPER;
 import static com.example.bruce.androidlifecycle.lifecyclelog.Util.recLifeCycle;
 
@@ -25,6 +21,7 @@ import static com.example.bruce.androidlifecycle.lifecyclelog.Util.recLifeCycle;
  * A standard v4 support version of Activity.
  */
 public class BruceFragmentActivity extends FragmentActivity {
+    BruceFragment bruceFragment;
     @Override
     public Resources getResources() {//解决系统改变字体大小的时候导致的界面布局混乱的问题,Application中也要加
         Resources res = super.getResources();
@@ -45,20 +42,27 @@ public class BruceFragmentActivity extends FragmentActivity {
         LoaderManager.enableDebugLogging(true);
 
         if(savedInstanceState == null){
+
 //            getFragmentManager()//Activity中的FragmentManager
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, BruceFragment.newInstance(0))
-                    .commit();
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.fragment_container, BruceFragment.newInstance(0))
+//                    .commit();
             //TODO:需要测试attach方法，对于的生命周期执行逻辑？？？？？？？
-            final BruceDialogFragment bruceDialogFragment = BruceDialogFragment.newInstance();
             findViewById(R.id.show_dialog).setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {//TODO:dialog上不能再加Fragment了
+                public void onClick(View v) {
+                    //1.dialog上不能再加Fragment了（下面的代码会报错）
 //                    Dialog dialog = new Dialog(BruceFragmentActivity.this);
-//                    View rootView = View.inflate(BruceFragmentActivity.this, R.layout.activity_bruce_dialog, null);
+//                    final View rootView = View.inflate(BruceFragmentActivity.this, R.layout.activity_bruce_dialog, null);
 //                    rootView.findViewById(R.id.show_dialog).setOnClickListener(new View.OnClickListener() {
 //                        @Override
 //                        public void onClick(View v) {
+//                            //java.lang.IllegalArgumentException: No view found for id 0x7f0b0067 (com.example.bruce.androidlifecycle:id/dialog_fragment_container) for fragment BruceDialogFragment{274f02 #0 id=0x7f0b0067}
+////                            View viewById = rootView.findViewById(R.id.dialog_fragment_container);
+////                            getSupportFragmentManager().beginTransaction()
+////                                    .add(viewById.getId(), BruceDialogFragment.newInstance())
+////                                    .commit();
+//
 //                            getSupportFragmentManager().beginTransaction()
 //                                    .add(R.id.dialog_fragment_container, BruceDialogFragment.newInstance())
 //                                    .commit();
@@ -67,7 +71,31 @@ public class BruceFragmentActivity extends FragmentActivity {
 //                    dialog.setContentView(rootView);
 //                    dialog.show();
 
-                    bruceDialogFragment.showDialog(BruceFragmentActivity.this, "dialog");
+//                    //2.测试DailogFragment上再添加Fragment，这是可以的
+//                    BruceDialogFragment bruceDialogFragment = BruceDialogFragment.newInstance();
+//                    bruceDialogFragment.showDialog(BruceFragmentActivity.this, "dialog");
+
+                    //3.动态显示移除Fragment
+//                    if(bruceFragment != null){
+//                        if(bruceFragment.isDetached()){
+//                            getSupportFragmentManager().beginTransaction().attach(bruceFragment).commit();
+//                        }else{
+//                            getSupportFragmentManager().beginTransaction().detach(bruceFragment).commit();
+//                        }
+//                    }else{
+//                        bruceFragment = BruceFragment.newInstance(0);
+//                        getSupportFragmentManager().beginTransaction()
+//                                .add(R.id.fragment_container, bruceFragment)
+//                                .commit();
+//                    }
+
+                    //TODO:
+                    //4. 测试Activity设置了singleTask之后，再打开自己，onPostCreate执行逻辑
+//                    Intent intent = new Intent(BruceFragmentActivity.this, BruceFragmentActivity.class);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                    startActivity(intent);
+
+                    NotificationUtils.showNotification(getApplicationContext(), "测试通知", null);
                 }
             });
         }else{
@@ -75,6 +103,15 @@ public class BruceFragmentActivity extends FragmentActivity {
             //Glide的引用了已经onDestory的Activity是厉害之后产生的，还是回到界面后产生的？？？？？
             //Fragment中显示在界面上的View，getContext会是null吗？？，或者getActivity会已经被destory了吗？？？
         }
+
+        //下面添加默认Fragment, 设置动画或添加到回退栈中
+/*        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//        fragmentTransaction.setTransitionStyle(customStyle);
+//        fragmentTransaction.setCustomAnimations();
+        fragmentTransaction.replace(R.id.fragment_container, BruceFragment.newInstance(0));
+//        fragmentTransaction.addToBackStack("bruce");//不能和setTransition同时使用
+        fragmentTransaction.commitNowAllowingStateLoss();*/
 
         //TODO:设置Layout
         //TODO:初始化布局
@@ -235,6 +272,11 @@ public class BruceFragmentActivity extends FragmentActivity {
     public void onUserInteraction() {
         super.onUserInteraction();
         recLifeCycle(getClass(), RETURN_FROM_SUPER);
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return super.onRetainCustomNonConfigurationInstance();
     }
 
     //ViewPager的使用
